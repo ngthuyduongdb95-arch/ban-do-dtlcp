@@ -42,31 +42,37 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
 }).addTo(map);
 
 fetch('dienbien_xa.geojson')
-.then(response=>{
-    if(!response.ok){
-        throw new Error("Không đọc được file GeoJSON");
-    }
-    return response.json();
-})
-.then(data=>{
+.then(r => r.json())
+.then(function(data){
 
-    var xa=L.geoJSON(data,{
-        style:{
-            color:"#0066cc",
-            weight:1,
-            fillColor:"#99ccff",
-            fillOpacity:0.4
+    console.log(data);
+
+    var layer = L.geoJSON(data,{
+        style:function(feature){
+            return{
+                color:"red",
+                weight:2,
+                fillColor:"yellow",
+                fillOpacity:0.5
+            };
         },
         onEachFeature:function(feature,layer){
-            layer.bindPopup(feature.properties.TenXa || "Không có tên xã");
-        }
-    }).addTo(map);
 
-    map.fitBounds(xa.getBounds());
+            console.log(feature.properties);
+
+            layer.bindPopup(
+                "<b>"+feature.properties.TenXa+"</b>"
+            );
+
+        }
+    });
+
+    layer.addTo(map);
+
+    map.fitBounds(layer.getBounds());
 
 })
-.catch(err=>{
+.catch(function(err){
     console.error(err);
-    alert(err);
 });
 </script>
