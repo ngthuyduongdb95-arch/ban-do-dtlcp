@@ -121,11 +121,19 @@ const x=bang[id];
 
 const soCon=x?Number(x["Số con tiêu hủy"]):0;
 
+const trangThai = x ? x["Trạng thái"] : "";
+
+let mauVien = "#4CAF50";
+
+if(trangThai=="Đang có dịch"){
+    mauVien="#ff0000";
+}
+
 return{
 
-color:"#555",
+color:mauVien,
 
-weight:1,
+weight:3,
 
 fillColor:getColor(soCon),
 
