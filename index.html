@@ -97,8 +97,8 @@ fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2
 
         onEachFeature:function(feature,layer){
 
-            const id = feature.properties.ID;
-            const x = bang[id];
+ const id = Number(feature.properties.ID);
+const x = bang[id];
 
             if(x){
 
@@ -138,3 +138,7 @@ fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2
     console.error(err);
 
 });
+</script>
+
+</body>
+</html>
