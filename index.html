@@ -41,38 +41,100 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap'
 }).addTo(map);
 
-fetch('dienbien_xa.geojson')
-.then(r => r.json())
-.then(function(data){
+Promise.all([
 
-    console.log(data);
+fetch("dienbien_xa.geojson").then(r => r.json()),
 
-    var layer = L.geoJSON(data,{
-        style:function(feature){
-            return{
-                color:"red",
-                weight:2,
-                fillColor:"yellow",
-                fillOpacity:0.5
-            };
-        },
-        onEachFeature:function(feature,layer){
+fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec").then(r => r.json())
 
-            console.log(feature.properties);
+]).then(function(result){
 
-            layer.bindPopup(
-                "<b>"+feature.properties.TenXa+"</b>"
-            );
+    const geojson = result[0];
+    const dulieu = result[1];
 
-        }
+    const bang = {};
+
+    dulieu.forEach(function(x){
+        bang[Number(x.ID)] = x;
     });
 
-    layer.addTo(map);
+    var layer = L.geoJSON(geojson,{
+
+        style:function(feature){
+
+            const id = Number(feature.properties.ID);
+            const x = bang[id];
+            console.log(id, x);
+
+            let mau = "#4CAF50";
+
+            if(x){
+
+                const soCon = Number(x["Số con tiêu hủy"]) || 0;
+
+                if(soCon == 0){
+                    mau = "#4CAF50";
+                }else if(soCon <= 100){
+                    mau = "#FFEB3B";
+                }else if(soCon <= 300){
+                    mau = "#FF9800";
+                }else if(soCon <= 800){
+                    mau = "#F44336";
+                }else{
+                    mau = "#7B1FA2";
+                }
+
+            }
+
+            return{
+                color:"#333",
+                weight:1,
+                fillColor:mau,
+                fillOpacity:0.7
+            };
+
+        },
+
+        onEachFeature:function(feature,layer){
+
+            const id = feature.properties.ID;
+            const x = bang[id];
+
+            if(x){
+
+                let mucDo="";
+
+                const soCon = Number(x["Số con tiêu hủy"]) || 0;
+
+                if(soCon==0){
+                    mucDo="Không có thiệt hại";
+                }else if(soCon<=100){
+                    mucDo="Thấp";
+                }else if(soCon<=300){
+                    mucDo="Trung bình";
+                }else if(soCon<=800){
+                    mucDo="Cao";
+                }else{
+                    mucDo="Rất cao";
+                }
+
+                layer.bindPopup(
+                    "<h3>"+x["Tên xã"]+"</h3>"+
+                    "<b>Số con tiêu hủy:</b> "+soCon+" con<br>"+
+                    "<b>Số ổ dịch:</b> "+x["Số ổ dịch"]+"<br>"+
+                    "<b>Mức độ:</b> "+mucDo
+                );
+
+            }
+
+        }
+
+    }).addTo(map);
 
     map.fitBounds(layer.getBounds());
 
-})
-.catch(function(err){
+}).catch(function(err){
+
     console.error(err);
+
 });
-</script>
