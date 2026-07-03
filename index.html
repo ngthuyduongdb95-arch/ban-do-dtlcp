@@ -71,6 +71,20 @@ fetch("dienbien_xa.geojson").then(r=>r.json()),
 fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec")
 .then(r=>r.json())
 
+])Promise.all([
+
+fetch("dienbien_xa.geojson")
+.then(r=>{
+    console.log("GeoJSON:", r.url, r.status);
+    return r.json();
+}),
+
+fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec")
+.then(r=>{
+    console.log("Apps Script:", r.url, r.status);
+    return r.json();
+})
+
 ])
 
 .then(function(rs){
