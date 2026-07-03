@@ -10,17 +10,31 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 
 html,body{
-
-height:100%;
-margin:0;
-
+    margin:0;
+    height:100%;
 }
 
 #map{
+    width:100%;
+    height:100%;
+}
 
-width:100%;
-height:100%;
+/* Chú giải */
+.legend{
+    background:white;
+    padding:10px;
+    line-height:22px;
+    border-radius:6px;
+    box-shadow:0 0 8px rgba(0,0,0,.3);
+    font-size:14px;
+}
 
+.legend i{
+    width:18px;
+    height:18px;
+    float:left;
+    margin-right:8px;
+    opacity:.8;
 }
 
 </style>
@@ -34,110 +48,195 @@ height:100%;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-var map = L.map('map').setView([21.4,103.0],9);
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+//===================== Khởi tạo bản đồ =====================
+
+var map=L.map("map").setView([21.4,103],9);
+
+L.tileLayer(
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
     maxZoom:19,
-    attribution:'© OpenStreetMap'
-}).addTo(map);
+    attribution:"© OpenStreetMap"
+}
+).addTo(map);
+
+
+//===================== Đọc dữ liệu =====================
 
 Promise.all([
 
-fetch("dienbien_xa.geojson").then(r => r.json()),
+fetch("dienbien_xa.geojson").then(r=>r.json()),
 
-fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec").then(r => r.json())
+fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec")
+.then(r=>r.json())
 
-]).then(function(result){
+])
 
-    const geojson = result[0];
-    const dulieu = result[1];
+.then(function(rs){
 
-    const bang = {};
+const geojson=rs[0];
 
-    dulieu.forEach(function(x){
-        bang[Number(x.ID)] = x;
-    });
+const sheet=rs[1];
 
-    var layer = L.geoJSON(geojson,{
+const bang={};
 
-        style:function(feature){
+//===================== Tạo bảng ID =====================
 
-            const id = Number(feature.properties.ID);
-            const x = bang[id];
-            console.log(id, x);
+sheet.forEach(function(r){
 
-            let mau = "#4CAF50";
-
-            if(x){
-
-                const soCon = Number(x["Số con tiêu hủy"]) || 0;
-
-                if(soCon == 0){
-                    mau = "#4CAF50";
-                }else if(soCon <= 100){
-                    mau = "#FFEB3B";
-                }else if(soCon <= 300){
-                    mau = "#FF9800";
-                }else if(soCon <= 800){
-                    mau = "#F44336";
-                }else{
-                    mau = "#7B1FA2";
-                }
-
-            }
-
-            return{
-                color:"#333",
-                weight:1,
-                fillColor:mau,
-                fillOpacity:0.7
-            };
-
-        },
-
-        onEachFeature:function(feature,layer){
-
- const id = Number(feature.properties.ID);
-const x = bang[id];
-
-            if(x){
-
-                let mucDo="";
-
-                const soCon = Number(x["Số con tiêu hủy"]) || 0;
-
-                if(soCon==0){
-                    mucDo="Không có thiệt hại";
-                }else if(soCon<=100){
-                    mucDo="Thấp";
-                }else if(soCon<=300){
-                    mucDo="Trung bình";
-                }else if(soCon<=800){
-                    mucDo="Cao";
-                }else{
-                    mucDo="Rất cao";
-                }
-
-                layer.bindPopup(
-                    "<h3>"+x["Tên xã"]+"</h3>"+
-                    "<b>Số con tiêu hủy:</b> "+soCon+" con<br>"+
-                    "<b>Số ổ dịch:</b> "+x["Số ổ dịch"]+"<br>"+
-                    "<b>Mức độ:</b> "+mucDo
-                );
-
-            }
-
-        }
-
-    }).addTo(map);
-
-    map.fitBounds(layer.getBounds());
-
-}).catch(function(err){
-
-    console.error(err);
+    bang[Number(r.ID)]=r;
 
 });
+
+
+//===================== Hàm tô màu =====================
+
+function getColor(soCon){
+
+soCon=Number(soCon)||0;
+
+if(soCon==0) return "#4CAF50";
+
+if(soCon<=100) return "#FFEB3B";
+
+if(soCon<=300) return "#FF9800";
+
+if(soCon<=800) return "#F44336";
+
+return "#7B1FA2";
+
+}
+
+
+//===================== Vẽ GeoJSON =====================
+
+var xa=L.geoJSON(geojson,{
+
+style:function(feature){
+
+const id=Number(feature.properties.ID);
+
+const x=bang[id];
+
+const soCon=x?Number(x["Số con tiêu hủy"]):0;
+
+return{
+
+color:"#555",
+
+weight:1,
+
+fillColor:getColor(soCon),
+
+fillOpacity:0.7
+
+};
+
+},
+
+onEachFeature:function(feature,layer){
+
+const id=Number(feature.properties.ID);
+
+const x=bang[id];
+
+if(x){
+
+let mucDo="";
+
+const soCon=Number(x["Số con tiêu hủy"]);
+
+if(soCon==0){
+
+mucDo="Không có dịch";
+
+}else if(soCon<=100){
+
+mucDo="Thấp";
+
+}else if(soCon<=300){
+
+mucDo="Trung bình";
+
+}else if(soCon<=800){
+
+mucDo="Cao";
+
+}else{
+
+mucDo="Rất cao";
+
+}
+
+layer.bindPopup(
+
+"<h3>"+x["Tên xã"]+"</h3>"+
+
+"<table>"+
+
+"<tr><td><b>Số ổ dịch</b></td><td>"+x["Số ổ dịch"]+"</td></tr>"+
+
+"<tr><td><b>Số con tiêu hủy</b></td><td>"+x["Số con tiêu hủy"]+"</td></tr>"+
+
+"<tr><td><b>Mức độ</b></td><td>"+mucDo+"</td></tr>"+
+
+"</table>"
+
+);
+
+}else{
+
+layer.bindPopup(feature.properties.TenXa);
+
+}
+
+}
+
+}).addTo(map);
+
+
+map.fitBounds(xa.getBounds());
+
+
+//===================== Chú giải =====================
+
+var legend=L.control({position:"bottomright"});
+
+legend.onAdd=function(){
+
+var div=L.DomUtil.create("div","legend");
+
+div.innerHTML=
+
+"<b>Chú giải</b><br><br>"+
+
+'<i style="background:#4CAF50"></i> Không có dịch<br>'+
+
+'<i style="background:#FFEB3B"></i> 1 - 100 con<br>'+
+
+'<i style="background:#FF9800"></i> 101 - 300 con<br>'+
+
+'<i style="background:#F44336"></i> 301 - 800 con<br>'+
+
+'<i style="background:#7B1FA2"></i> Trên 800 con';
+
+return div;
+
+};
+
+legend.addTo(map);
+
+})
+
+.catch(function(e){
+
+console.error(e);
+
+alert("Không đọc được dữ liệu: "+e);
+
+});
+
 </script>
 
 </body>
