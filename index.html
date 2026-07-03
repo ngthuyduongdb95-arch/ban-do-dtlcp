@@ -143,31 +143,7 @@ const x=bang[id];
 
 if(x){
 
-let mucDo="";
-
-const soCon=Number(x["Số con tiêu hủy"]);
-
-if(soCon==0){
-
-mucDo="Không có dịch";
-
-}else if(soCon<=100){
-
-mucDo="Thấp";
-
-}else if(soCon<=300){
-
-mucDo="Trung bình";
-
-}else if(soCon<=800){
-
-mucDo="Cao";
-
-}else{
-
-mucDo="Rất cao";
-
-}
+const trangThai = x["Trạng thái"];
 
 layer.bindPopup(
 
@@ -179,7 +155,7 @@ layer.bindPopup(
 
 "<tr><td><b>Số con tiêu hủy</b></td><td>"+x["Số con tiêu hủy"]+"</td></tr>"+
 
-"<tr><td><b>Mức độ</b></td><td>"+mucDo+"</td></tr>"+
+"<b>Trạng thái:</b> "+trangThai"
 
 "</table>"
 
