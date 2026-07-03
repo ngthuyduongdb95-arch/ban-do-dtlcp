@@ -144,10 +144,9 @@ const x=bang[id];
 if(x){
 
 const trangThai = x["Trạng thái"];
-
+const trangThai = x["Trạng thái"] || "Chưa xác định";
+    
 layer.bindPopup(
-
-"<h3>"+x["Tên xã"]+"</h3>"+
 
 "<table>"+
 
@@ -155,7 +154,7 @@ layer.bindPopup(
 
 "<tr><td><b>Số con tiêu hủy</b></td><td>"+x["Số con tiêu hủy"]+"</td></tr>"+
 
-"<b>Trạng thái:</b> "+trangThai"
+"<tr><td><b>Trạng thái</b></td><td>"+trangThai+"</td></tr>"+
 
 "</table>"
 
