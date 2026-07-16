@@ -1,0 +1,314 @@
+/* ======================================================
+   WEBGIS QUẢN LÝ THÚ Y ĐIỆN BIÊN
+====================================================== */
+
+:root{
+
+    --green:#0B6E4F;
+    --green2:#17A673;
+    --light:#F5F7FA;
+    --border:#E5E7EB;
+    --card:#FFFFFF;
+    --shadow:0 4px 12px rgba(0,0,0,.08);
+
+}
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+    overflow:hidden;
+
+    font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+    background:#eef2f7;
+
+}
+
+/* HEADER */
+
+header{
+
+    height:65px;
+
+    background:linear-gradient(90deg,#0B6E4F,#198754);
+
+    color:white;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 20px;
+
+}
+
+.logo{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+.toolbar{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.toolbar button{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+/* MAIN */
+
+.container{
+
+    display:grid;
+
+    grid-template-columns:330px 1fr;
+
+    height:calc(100vh - 65px);
+
+}
+
+/* SIDEBAR */
+
+.sidebar{
+
+    background:white;
+
+    overflow:auto;
+
+    padding:18px;
+
+    border-right:1px solid var(--border);
+
+}
+
+.sidebar h2{
+
+    color:#198754;
+
+    margin-bottom:15px;
+
+}
+
+/* CARD */
+
+.card{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+
+    box-shadow:var(--shadow);
+
+    border-left:6px solid #198754;
+
+}
+
+.card .title{
+
+    color:#555;
+
+    margin-bottom:10px;
+
+}
+
+.card div:last-child{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:#198754;
+
+}
+
+/* FORM */
+
+label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    cursor:pointer;
+
+}
+
+input[type=text]{
+
+    width:100%;
+
+    padding:12px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    margin-top:10px;
+
+    margin-bottom:10px;
+
+}
+
+button{
+
+    transition:.25s;
+
+}
+
+#btnSearch{
+
+    width:100%;
+
+    background:#198754;
+
+    color:white;
+
+    border:none;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+#btnSearch:hover{
+
+    background:#146c43;
+
+}
+
+/* MAP */
+
+#map{
+
+    width:100%;
+
+    height:100%;
+
+}
+
+/* POPUP */
+
+.leaflet-popup-content{
+
+    font-size:14px;
+
+    line-height:1.5;
+
+}
+
+.popup-title{
+
+    font-size:18px;
+
+    color:#198754;
+
+    font-weight:bold;
+
+    margin-bottom:10px;
+
+}
+
+.popup-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.popup-table td{
+
+    padding:5px;
+
+    border-bottom:1px solid #eee;
+
+}
+
+/* LEGEND */
+
+.legend{
+
+    background:white;
+
+    padding:10px;
+
+    border-radius:8px;
+
+    box-shadow:var(--shadow);
+
+    line-height:22px;
+
+}
+
+.legend i{
+
+    width:18px;
+
+    height:18px;
+
+    float:left;
+
+    margin-right:8px;
+
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.container{
+
+grid-template-columns:1fr;
+
+}
+
+.sidebar{
+
+height:320px;
+
+}
+
+}
