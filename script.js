@@ -108,3 +108,90 @@ function createMap() {
     }).addTo(APP.map);
 
 }
+/*=========================================================
+ LOAD API
+=========================================================*/
+
+async function loadAPI(){
+
+    try{
+
+        const response = await fetch(CONFIG.API);
+
+        if(!response.ok){
+
+            throw new Error("Không đọc được API");
+
+        }
+
+        APP.data = await response.json();
+
+        APP.dataMap = {};
+
+        APP.data.forEach(item=>{
+
+            APP.dataMap[Number(item.ID)] = item;
+
+        });
+
+        console.log("Đã đọc",APP.data.length,"bản ghi.");
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        alert("Không kết nối được Apps Script API.");
+
+    }
+
+}
+
+/*=========================================================
+ LOAD GEOJSON
+=========================================================*/
+
+async function loadGeoJSON(){
+
+    try{
+
+        const response = await fetch(CONFIG.GEOJSON);
+
+        if(!response.ok){
+
+            throw new Error("Không đọc được GeoJSON");
+
+        }
+
+        APP.boundary = await response.json();
+
+        console.log("GeoJSON OK");
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        alert("Không đọc được GeoJSON.");
+
+    }
+
+}/*=========================================================
+ INIT
+=========================================================*/
+
+async function init(){
+
+    createBaseMaps();
+
+    createMap();
+
+    await loadAPI();
+
+    await loadGeoJSON();
+
+}
+
+window.onload = init;
