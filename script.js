@@ -11,7 +11,7 @@
 
 const CONFIG = {
 
-    API: "DÁN_URL_APPS_SCRIPT_CỦA_BẠN_VÀO_ĐÂY",
+    API: "https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec",
 
     GEOJSON: "geojson/dienbien_xa.geojson",
 
