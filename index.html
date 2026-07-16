@@ -1,227 +1,212 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="utf-8">
-<title>Bản đồ DTLCP Điện Biên</title>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>WEBGIS Quản lý thú y tỉnh Điện Biên</title>
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<style>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
 
-html,body{
-    margin:0;
-    height:100%;
-}
-
-#map{
-    width:100%;
-    height:100%;
-}
-
-/* Chú giải */
-.legend{
-    background:white;
-    padding:10px;
-    line-height:22px;
-    border-radius:6px;
-    box-shadow:0 0 8px rgba(0,0,0,.3);
-    font-size:14px;
-}
-
-.legend i{
-    width:18px;
-    height:18px;
-    float:left;
-    margin-right:8px;
-    opacity:.8;
-}
-
-</style>
+<link rel="stylesheet"
+href="style.css">
 
 </head>
 
 <body>
 
+<!-- HEADER -->
+
+<header>
+
+<div class="logo">
+
+🐄 WEBGIS QUẢN LÝ THÚ Y TỈNH ĐIỆN BIÊN
+
+</div>
+
+<div class="toolbar">
+
+<button id="btnHome">
+
+<i class="fa-solid fa-house"></i>
+
+</button>
+
+<button id="btnLocate">
+
+<i class="fa-solid fa-location-crosshairs"></i>
+
+</button>
+
+<button id="btnSatellite">
+
+🛰️
+
+</button>
+
+</div>
+
+</header>
+
+<!-- MAIN -->
+
+<div class="container">
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>Dashboard</h2>
+
+<div class="card">
+
+<div class="title">
+
+Đang có dịch
+
+</div>
+
+<div id="txtDangCoDich">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="title">
+
+Qua 21 ngày
+
+</div>
+
+<div id="txtQua21">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="title">
+
+Số ổ dịch
+
+</div>
+
+<div id="txtODich">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="title">
+
+Tiêu hủy
+
+</div>
+
+<div id="txtTieuHuy">
+
+0
+
+</div>
+
+</div>
+
+<hr>
+
+<h2>Dữ liệu</h2>
+
+<label>
+
+<input type="checkbox" checked id="chkDTLCP">
+
+DTLCP
+
+</label>
+
+<label>
+
+<input type="checkbox" checked id="chkCGC">
+
+Cúm gia cầm
+
+</label>
+
+<label>
+
+<input type="checkbox" checked id="chkVDNC">
+
+VDNC
+
+</label>
+
+<label>
+
+<input type="checkbox" checked id="chkKSGM">
+
+KSGM
+
+</label>
+
+<label>
+
+<input type="checkbox" checked id="chkCS">
+
+CS thuốc thú y
+
+</label>
+
+<hr>
+
+<h2>Tìm kiếm</h2>
+
+<input
+
+type="text"
+
+id="txtSearch"
+
+placeholder="Nhập tên xã...">
+
+<button id="btnSearch">
+
+Tìm
+
+</button>
+
+</div>
+
+<!-- MAP -->
+
 <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</div>
 
-<script>
-
-//===================== Khởi tạo bản đồ =====================
-
-var map=L.map("map").setView([21.4,103],9);
-
-L.tileLayer(
-"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
-    maxZoom:19,
-    attribution:"© OpenStreetMap"
-}
-).addTo(map);
-
-
-//===================== Đọc dữ liệu =====================
-
-Promise.all([
-
-    fetch("dienbien_xa.geojson").then(r => r.json()),
-
-    fetch("https://script.google.com/macros/s/AKfycbz3zkALIKFWDpCYOs4XoBJMMpZL5dbWy2kubnrQDKyllSk4HyrDVeYDhnMmkr7r5PBy/exec")
-        .then(r => r.json())
-
-]).then(function(rs){
-
-.then(function(rs){
-
-const geojson=rs[0];
-
-const sheet=rs[1];
-
-const bang={};
-
-//===================== Tạo bảng ID =====================
-
-sheet.forEach(function(r){
-
-    bang[Number(r.ID)]=r;
-
-});
-
-
-//===================== Hàm tô màu =====================
-
-function getColor(soCon){
-
-soCon=Number(soCon)||0;
-
-if(soCon==0) return "#4CAF50";
-
-if(soCon<=100) return "#FFEB3B";
-
-if(soCon<=300) return "#FF9800";
-
-if(soCon<=800) return "#F44336";
-
-return "#7B1FA2";
-
-}
-
-
-//===================== Vẽ GeoJSON =====================
-
-var xa=L.geoJSON(geojson,{
-
-style:function(feature){
-
-const id=Number(feature.properties.ID);
-
-const x=bang[id];
-
-const soCon=x?Number(x["Số con tiêu hủy"]):0;
-
-const trangThai = x ? x["Trạng thái"] : "";
-
-let mauVien = "#4CAF50";
-
-if(trangThai=="Đang có dịch"){
-    mauVien="#ff0000";
-}
-
-return{
-
-color:mauVien,
-
-weight:3,
-
-fillColor:getColor(soCon),
-
-fillOpacity:0.7
-
-};
-
-},
-
-onEachFeature:function(feature,layer){
-
-const id=Number(feature.properties.ID);
-
-const x=bang[id];
-
-if(x){
-
-const trangThai = x["Trạng thái"] || "Chưa xác định";
-    
-layer.bindPopup(
-
-"<h3>"+x["Tên xã"]+"</h3>"+
-
-"<table>"+
-
-"<tr><td><b>Số ổ dịch</b></td><td>"+x["Số ổ dịch"]+"</td></tr>"+
-
-"<tr><td><b>Số con tiêu hủy</b></td><td>"+x["Số con tiêu hủy"]+"</td></tr>"+
-
-"<tr><td><b>Trạng thái</b></td><td>"+trangThai+"</td></tr>"+
-
-"</table>"
-
-);
-
-}else{
-
-layer.bindPopup(feature.properties.TenXa);
-
-}
-
-}
-
-}).addTo(map);
-
-
-map.fitBounds(xa.getBounds());
-
-
-//===================== Chú giải =====================
-
-var legend=L.control({position:"bottomright"});
-
-legend.onAdd=function(){
-
-var div=L.DomUtil.create("div","legend");
-
-div.innerHTML=
-
-"<b>Chú giải</b><br><br>"+
-
-'<i style="background:#4CAF50"></i> Không có dịch<br>'+
-
-'<i style="background:#FFEB3B"></i> 1 - 100 con<br>'+
-
-'<i style="background:#FF9800"></i> 101 - 300 con<br>'+
-
-'<i style="background:#F44336"></i> 301 - 800 con<br>'+
-
-'<i style="background:#7B1FA2"></i> Trên 800 con';
-
-return div;
-
-};
-
-legend.addTo(map);
-
-})
-
-.catch(function(e){
-
-console.error(e);
-
-alert("Không đọc được dữ liệu: "+e);
-
-});
-
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
+<script src="script.js"></script>
+
 </body>
+
 </html>
